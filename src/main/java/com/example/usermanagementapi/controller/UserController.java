@@ -44,10 +44,10 @@ public class UserController {
      * Endpoint: /api/users
      * Response: List of User objects with HTTP Status 200 (OK)
      */
-//    @GetMapping
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll(); // Retrieves all users from the database
-//    }
+    @GetMapping("/all")
+    public List<User> getAllUsers() {
+        return userRepository.findAll(); // Retrieves all users from the database
+    }
 
     /**
      * Retrieves a user by ID.
@@ -114,7 +114,7 @@ public class UserController {
      * - sort (e.g., "name,asc" or "email,desc"): Sorting criteria.
      * Response: Page object containing a list of User objects with HTTP Status 200 (OK)
      */
-    @GetMapping // Overload the existing GET /api/users
+    @GetMapping("page")
     public Page<User> getUsers(Pageable pageable) {
         // Spring Data JPA's findAll method can accept a Pageable object
         // This automatically applies pagination and sorting based on query parameters
