@@ -114,10 +114,12 @@ public class UserController {
      * - sort (e.g., "name,asc" or "email,desc"): Sorting criteria.
      * Response: Page object containing a list of User objects with HTTP Status 200 (OK)
      */
-    @GetMapping // Overload the existing GET /api/users
+    @GetMapping("/page") // Overload the existing GET /api/users
     public Page<User> getUsers(Pageable pageable) {
         // Spring Data JPA's findAll method can accept a Pageable object
         // This automatically applies pagination and sorting based on query parameters
         return userRepository.findAll(pageable);
+
+//adding a comment simply
     }
 }
