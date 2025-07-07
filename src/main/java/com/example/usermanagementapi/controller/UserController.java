@@ -150,6 +150,7 @@ public class UserController {
      * Query Parameters: page, size, sort
      * Response: Page object containing a list of User objects with HTTP Status 200 (OK)
      */
+
     @GetMapping("/page") // Publicly accessible as per SecurityConfig
     public Page<User> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
