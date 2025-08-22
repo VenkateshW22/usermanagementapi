@@ -81,6 +81,33 @@ public class UserController {
         return userRepository.findAll();
     }
 
+
+    /**
+     * Retrieves all users with pagination support.
+     * <p>
+     * This endpoint returns a paginated list of all users in the system.
+     * The response includes pagination metadata such as total elements, total pages, etc.
+     *
+     * @param pageable Pagination information (page number, size, and sorting parameters)
+     * @return A {@link org.springframework.data.domain.Page} containing the list of users and pagination information
+     * @apiNote Example usage: /api/users/all?page=0&size=10&sort=name,asc
+     * @apiParam (Query Parameters) {number} [page=0] Zero-based page index (0..N)
+     * @apiParam (Query Parameters) {number} [size=20] The size of the page to be returned
+     * @apiParam (Query Parameters) {string} [sort] Sorting criteria in the format: property(,asc|desc).
+     *           Default sort order is ascending. Multiple sort criteria are supported.
+     * @apiExample Example request:
+     * GET /api/users/all?page=0&size=10&sort=name,asc
+     * @apiSuccess (200) {Object[]} content List of users
+     * @apiSuccess (200) {number} totalElements Total number of users
+     * @apiSuccess (200) {number} totalPages Total number of pages
+     * @apiSuccess (200) {number} size Number of users per page
+     * @apiSuccess (200) {number} number Current page number (zero-based)
+     */
+    @GetMapping("/all")
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
     /**
      * Retrieves a user by ID.
      * HTTP Method: GET

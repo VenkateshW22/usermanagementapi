@@ -62,6 +62,57 @@ public class UserControllerTest {
         userRepository.deleteAll();
     }
     
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAllUsers_WithPagination_ShouldReturnPaginatedResults() throws Exception {
+        // Create multiple test users
+        for (int i = 1; i <= 15; i++) {
+            User user = new User();
+            user.setName("User " + i);
+            user.setEmail("user" + i + "@example.com");
+            user.setPassword("Password123!");
+            user.setRoles(Set.of("ROLE_USER"));
+            userRepository.save(user);
+        }
+        
+        // Test page 0 with 5 items
+        mockMvc.perform(get("/api/users/all")
+                .param("page", "0")
+                .param("size", "5")
+                .param("sort", "name,asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.totalElements").value(16)) // 15 new + 1 from setup
+                .andExpect(jsonPath("$.totalPages").value(4)) // 16/5 = 4 pages
+                .andExpect(jsonPath("$.size").value(5))
+                .andExpect(jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.content[0].name").value("Test User")) // First user from setup
+                .andExpect(jsonPath("$.content[0].email").value("test@example.com"));
+        
+        // Test page 1 with 10 items
+        mockMvc.perform(get("/api/users/all")
+                .param("page", "1")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(6)) // Remaining 6 users (16 total - 10 on first page)
+                .andExpect(jsonPath("$.number").value(1));
+    }
+    
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAllUsers_WithDefaultPagination_ShouldReturnFirstPage() throws Exception {
+        // Test without any pagination parameters (should use defaults)
+        mockMvc.perform(get("/api/users/all"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1)) // Only the test user from setup
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.first").value(true))
+                .andExpect(jsonPath("$.last").value(true));
+    }
+    
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "  "})
